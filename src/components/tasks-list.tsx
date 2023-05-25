@@ -6,6 +6,7 @@ interface TaskListProps {
   tasks: Task[];
 }
 
+// receive tasks to show
 const TasksList: React.FC<TaskListProps> = ({ tasks }) => {
   return (
     <>

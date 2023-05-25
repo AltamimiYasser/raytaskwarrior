@@ -178,3 +178,14 @@ export const deleteProject = async (project: string) => {
     await deleteTask(task.uuid);
   }
 };
+
+// returns all projects with active tasks
+export const getAllProjects = async () => {
+  const tasks = await getActiveTasks();
+  const projects = new Set<string>();
+  tasks.forEach((task) => {
+    if (task.project) projects.add(task.project);
+  });
+  projects.add("All");
+  return projects;
+};
