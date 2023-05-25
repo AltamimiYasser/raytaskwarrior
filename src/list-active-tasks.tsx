@@ -7,17 +7,13 @@ import { Task } from "./types/types";
 const Command = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Set<string>>(new Set([]));
-  const [isLoading, setisLoading] = useState(true);
 
   useEffect(() => {
     const getProjects = async () => {
       try {
-        setisLoading(true);
         const data = await getAllProjects();
-        setisLoading(false);
         setProjects(data);
       } catch (error) {
-        setisLoading(false);
         await showToast({
           style: Toast.Style.Failure,
           title: "Error",
@@ -70,17 +66,13 @@ const Command = () => {
   return (
     <List
       navigationTitle="filter by project"
-      isLoading={isLoading}
-      searchBarAccessory={
-        <ProjectsDropdown projects={projects} onProjectChange={onProjectChange} isLoading={isLoading} />
-      }
+      searchBarAccessory={<ProjectsDropdown projects={projects} onProjectChange={onProjectChange} />}
     >
       {tasks.length === 0 ? (
         // TODO: add actions to add a new task
         <List.EmptyView title="No Tasks Found" description="make sure you have added at least one task." />
       ) : (
-        // TODO: add accessories to show other info about the task
-        // on Enter: open task details page
+        // TODO: on Enter: open task details page
         tasks.map((task) => (
           <List.Item id={task.uuid} title={task.description} key={task.uuid} accessories={[{ text: task.project }]} />
         ))
