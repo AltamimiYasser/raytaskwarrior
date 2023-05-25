@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getActiveTasks } from "./api";
-import { Detail, List } from "@raycast/api";
+import TasksList from "./components/tasks-list";
 import { Task } from "./types/types";
 
 const Command = () => {
@@ -12,15 +12,7 @@ const Command = () => {
     });
   });
 
-  return (
-    <>
-      <List>
-        {tasks.map((task) => (
-          <List.Item key={task.uuid} title={task.description} />
-        ))}
-      </List>
-    </>
-  );
+  return <TasksList tasks={tasks} />;
 };
 
 export default Command;

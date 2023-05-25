@@ -1,15 +1,17 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import { Task, Status } from "./types/types";
+import { getPreferenceValues } from "@raycast/api";
 
 const execPromise = promisify(exec);
+const taskPath = getPreferenceValues().taskPath;
 
 // returns a list of all tasks sorted by urgency
 export const getTasks = async () => {
   let tasks: Task[] = [];
   try {
     // TODO: take the path to task from user
-    const command = "/opt/homebrew/bin/task export rc.json.array:on";
+    const command = `${taskPath} export rc.json.array:on`;
     const { stdout, stderr } = await execPromise(command);
     if (stderr) console.error(stderr);
 
@@ -51,22 +53,22 @@ export const addTask = async (description: string, project?: string, tag?: strin
   // only description -> task add "<description>"
   let command = "";
   if (typeof project === "undefined" && typeof tag === "undefined") {
-    command = `task add "${description}"`;
+    command = `${taskPath} add "${description}"`;
   }
 
   // description & project -> task add <description> project:<project>
   else if (typeof project !== "undefined" && typeof tag === "undefined") {
-    command = `task add "${description}" project:"${project}"`;
+    command = `${taskPath} add "${description}" project:"${project}"`;
   }
 
   // description & tag -> task add <description> +<tag>
   else if (typeof project === "undefined" && typeof tag !== "undefined") {
-    command = `task add "${description}" ${tag}`;
+    command = `${taskPath} add "${description}" ${tag}`;
   }
 
   // description & tag & project task add <description> project:<project> +<tag>
   else if (typeof project !== "undefined" && typeof tag !== "undefined") {
-    command = `task add "${description}" project:"${project}" ${tag}`;
+    command = `${taskPath} add "${description}" project:"${project}" ${tag}`;
   }
 
   // execute command
@@ -81,7 +83,7 @@ export const addTask = async (description: string, project?: string, tag?: strin
 // delete task by its uuid
 export const deleteTask = async (uuid: string) => {
   try {
-    const { stderr } = await execPromise(`task delete ${uuid} rc.confirmation:off`);
+    const { stderr } = await execPromise(`${taskPath} delete ${uuid} rc.confirmation:off`);
     if (stderr) console.error(stderr);
   } catch (error) {
     console.error(error);
@@ -91,7 +93,7 @@ export const deleteTask = async (uuid: string) => {
 // mark a task as done by its uuid
 export const markTaskAsDone = async (uuid: string) => {
   try {
-    const { stderr } = await execPromise(`task ${uuid} done`);
+    const { stderr } = await execPromise(`${taskPath} ${uuid} done`);
     if (stderr) console.error(stderr);
   } catch (error) {
     console.error(error);
@@ -104,50 +106,50 @@ export const modifyTask = async (uuid: string, description?: string, project?: s
 
   // change description only:
   if (typeof description !== "undefined" && typeof project === "undefined" && typeof tag === "undefined") {
-    command = `task modify ${uuid} "${description}"`;
+    command = `${taskPath} modify ${uuid} "${description}"`;
   }
 
   // change and remove project
   if (typeof description === "undefined" && typeof project !== "undefined" && typeof tag === "undefined") {
     // change project only
-    if (project !== "-") command = `task modify ${uuid} project:"${project}"`;
+    if (project !== "-") command = `${taskPath} modify ${uuid} project:"${project}"`;
 
     // Remove project only
-    if (project === "-") command = `task modify ${uuid} project:`;
+    if (project === "-") command = `${taskPath} modify ${uuid} project:`;
   }
 
   // add and remove tag
   if (typeof description === "undefined" && typeof project === "undefined" && typeof tag !== "undefined") {
-    command = `task modify ${uuid} ${tag}`;
+    command = `${taskPath} modify ${uuid} ${tag}`;
   }
 
   if (typeof description !== "undefined" && typeof project !== "undefined" && typeof tag === "undefined") {
     // Change description, change project
-    if (project !== "-") command = `task modify ${uuid} "${description}" project:"${project}"`;
+    if (project !== "-") command = `${taskPath} modify ${uuid} "${description}" project:"${project}"`;
 
     // Change description, remove project
-    if (project === "-") command = `task modify ${uuid} "${description}" project:`;
+    if (project === "-") command = `${taskPath} modify ${uuid} "${description}" project:`;
   }
 
   // Change description & add or remove tag
   if (typeof description !== "undefined" && typeof project === "undefined" && typeof tag !== "undefined") {
-    command = `task modify ${uuid} "${description}"  ${tag}`;
+    command = `${taskPath} modify ${uuid} "${description}"  ${tag}`;
   }
 
   if (typeof description === "undefined" && typeof project !== "undefined" && typeof tag !== "undefined") {
     // Change project, add or remove tag
-    if (project !== "-") command = `task modify ${uuid} project:"${project}" ${tag}`;
+    if (project !== "-") command = `${taskPath} modify ${uuid} project:"${project}" ${tag}`;
 
     // Remove project, add or remove tag
-    if (project === "-") command = `task modify ${uuid} project: ${tag}`;
+    if (project === "-") command = `${taskPath} modify ${uuid} project: ${tag}`;
   }
 
   if (typeof description !== "undefined" && typeof project !== "undefined" && typeof tag !== "undefined") {
     // Change description, change project, add or remove tag
-    if (project !== "-") command = `task modify ${uuid} "${description}" project:"${project}" ${tag}`;
+    if (project !== "-") command = `${taskPath} modify ${uuid} "${description}" project:"${project}" ${tag}`;
 
     // Change description, remove project, add or remove tag
-    if (project === "-") command = `task modify "${description}" ${uuid} project: ${tag}`;
+    if (project === "-") command = `${taskPath} modify "${description}" ${uuid} project: ${tag}`;
   }
 
   // execute command
