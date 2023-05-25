@@ -11,7 +11,7 @@ const TasksList: React.FC<TaskListProps> = ({ tasks }) => {
     <>
       <List>
         {tasks.map((task) => (
-          <List.Item id={task.uuid} title={task.description} />
+          <List.Item id={task.uuid} title={task.description} key={task.uuid} />
         ))}
       </List>
     </>

@@ -6,19 +6,22 @@ import { getPreferenceValues } from "@raycast/api";
 const execPromise = promisify(exec);
 const taskPath = getPreferenceValues().taskPath;
 
+const overrideError = "Configuration override rc.json.array:on\n";
+const command = `${taskPath} export rc.json.array:on`;
+
 // returns a list of all tasks sorted by urgency
 export const getTasks = async () => {
   let tasks: Task[] = [];
   try {
-    // TODO: take the path to task from user
-    const command = `${taskPath} export rc.json.array:on`;
     const { stdout, stderr } = await execPromise(command);
-    if (stderr) console.error(stderr);
+    if (stderr && stderr !== overrideError) {
+      throw new Error("Please make sure you have set the path to task in the settings");
+    }
 
     const data = JSON.parse(stdout) as Task[];
     if (data) tasks = data.sort((a, b) => b.urgency - a.urgency);
   } catch (error) {
-    console.error(error);
+    throw new Error("Error loading tasks. Task could not be loaded");
   }
   return tasks;
 };
