@@ -32,12 +32,9 @@ const Command = () => {
 
   const getTasks = async () => {
     try {
-      setisLoading(true);
       const data = await getActiveTasks();
-      setisLoading(false);
       setTasks(data);
     } catch (error) {
-      setisLoading(false);
       await showToast({
         style: Toast.Style.Failure,
         title: "Error",
@@ -70,7 +67,6 @@ const Command = () => {
     filterByProject(newValue);
   };
 
-  // send appropriate tasks filtered by project selected to TasksList
   return (
     <List
       navigationTitle="filter by project"
@@ -84,7 +80,10 @@ const Command = () => {
         <List.EmptyView title="No Tasks Found" description="make sure you have added at least one task." />
       ) : (
         // TODO: add accessories to show other info about the task
-        tasks.map((task) => <List.Item id={task.uuid} title={task.description} key={task.uuid} />)
+        // on Enter: open task details page
+        tasks.map((task) => (
+          <List.Item id={task.uuid} title={task.description} key={task.uuid} accessories={[{ text: task.project }]} />
+        ))
       )}
     </List>
   );

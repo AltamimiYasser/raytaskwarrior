@@ -2,19 +2,13 @@ import { List } from "@raycast/api";
 
 // TODO: make it generic so we can filter by project and tag
 //
-const ProjectsDropdown = (props: {
-  projects: Set<string>;
-  onProjectChange: (newValue: string) => void;
-  isLoading: boolean;
-}) => {
-  const { projects: projects, onProjectChange: onProjectChange, isLoading: isLoading } = props;
+const ProjectsDropdown = (props: { projects: Set<string>; onProjectChange: (newValue: string) => void }) => {
+  const { projects: projects, onProjectChange: onProjectChange } = props;
   return (
     <List.Dropdown
       tooltip="Select Project"
       storeValue={true}
-      filtering={false}
       defaultValue={"All"}
-      isLoading={isLoading}
       onChange={(newValue) => {
         onProjectChange(newValue);
       }}
