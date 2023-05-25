@@ -1,8 +1,9 @@
-import { showToast, Toast, List, popToRoot, Action, ActionPanel, Detail } from "@raycast/api";
+import { showToast, Toast, List, popToRoot, Action, ActionPanel } from "@raycast/api";
 import { useState, useEffect } from "react";
 import { getActiveTasks, getAllProjects, getTasksForProject } from "./api";
 import ProjectsDropdown from "./components/ProjectsDropdown";
 import { Task } from "./types/types";
+import Details from "./components/Details";
 
 const Command = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -70,10 +71,8 @@ const Command = () => {
     >
       {tasks.length === 0 ? (
         // TODO: add actions to add a new task
-        // we can use Action.Push to push another view see example at the end of the file
         <List.EmptyView title="No Tasks Found" description="make sure you have added at least one task." />
       ) : (
-        // TODO: on Enter: open task details page
         tasks.map((task) => (
           <List.Item
             id={task.uuid}
@@ -81,6 +80,8 @@ const Command = () => {
             key={task.uuid}
             accessories={[{ text: task.project }]}
             actions={
+              // TODO: Add more actions: (modify, delete, mark as done)
+              // check raycast default actions to add what fits
               <ActionPanel>
                 <Action.Push title="Details" target={<Details task={task} />} />
               </ActionPanel>
@@ -92,39 +93,4 @@ const Command = () => {
   );
 };
 
-const Details = (props: { task: Task }) => {
-  const { task: task } = props;
-  return (
-    <>
-      <Detail markdown={`# ${task.description}`} />
-    </>
-  );
-};
-
-// const ProjectsDropdown = (props: { projects: Set<string>; onProjectChange: (newValue: string) => void }) => {
-//   const { projects: projects, onProjectChange: onProjectChange } = props;
-
 export default Command;
-
-// import { ActionPanel, Detail, Action } from "@raycast/api";
-//
-// function Ping() {
-//   return (
-//     <Detail
-//       markdown="Ping"
-//       actions={
-//         <ActionPanel>
-//           <Action.Push title="Push Pong" target={<Pong />} />
-//         </ActionPanel>
-//       }
-//     />
-//   );
-// }
-//
-// function Pong() {
-//   return <Detail markdown="Pong" />;
-// }
-//
-// export default function Command() {
-//   return <Ping />;
-// }

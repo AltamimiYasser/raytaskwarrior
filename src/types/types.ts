@@ -4,7 +4,7 @@ export interface Task {
   description: string;
   entry: string;
   modified?: string;
-  status: string; //  TODO: enum
+  status: string;
   urgency: number;
   annotations?: string[]; //  TODO: enum?
   start?: string;
