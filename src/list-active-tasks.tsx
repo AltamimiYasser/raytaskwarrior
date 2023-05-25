@@ -9,17 +9,16 @@ const Command = () => {
 
   useEffect(() => {
     const getTasks = async () => {
-      setTasks(await getActiveTasks());
-      // try {
-      //   const data = await getActiveTasks();
-      //   setTasks(data);
-      // } catch (error) {
-      //   await showToast({
-      //     style: Toast.Style.Failure,
-      //     title: "Error",
-      //     message: `${error}`,
-      //   });
-      // }
+      try {
+        const data = await getActiveTasks();
+        setTasks(data);
+      } catch (error) {
+        await showToast({
+          style: Toast.Style.Failure,
+          title: "Error",
+          message: `${error}`,
+        });
+      }
     };
     getTasks();
   }, []);

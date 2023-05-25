@@ -15,17 +15,19 @@ export const getTasks = async () => {
   try {
     const { stdout, stderr } = await execPromise(command);
     if (stderr && stderr !== overrideError) {
-      throw new Error("Please make sure you have set the path to task in the settings");
+      throw new Error("please make sure you have set the path to task in the extension settings");
     }
 
     const data = JSON.parse(stdout) as Task[];
     if (data) tasks = data.sort((a, b) => b.urgency - a.urgency);
   } catch (error) {
-    throw new Error("Error loading tasks. Task could not be loaded");
+    throw new Error("Please make sure you have set the path to task in the settings");
   }
   return tasks;
 };
 
+// TODO: maybe not needed
+//
 // returns a single task by its uuid
 export const getTask = async (uuid: string) => {
   const tasks = await getTasks();
@@ -79,7 +81,7 @@ export const addTask = async (description: string, project?: string, tag?: strin
     const { stderr } = await execPromise(command);
     if (stderr) console.error(stderr);
   } catch (error) {
-    console.error(error);
+    throw new Error(`error in addTask function: "${error}"`);
   }
 };
 
@@ -89,7 +91,7 @@ export const deleteTask = async (uuid: string) => {
     const { stderr } = await execPromise(`${taskPath} delete ${uuid} rc.confirmation:off`);
     if (stderr) console.error(stderr);
   } catch (error) {
-    console.error(error);
+    throw new Error(`error in deleteTask function: "${error}"`);
   }
 };
 
@@ -99,7 +101,7 @@ export const markTaskAsDone = async (uuid: string) => {
     const { stderr } = await execPromise(`${taskPath} ${uuid} done`);
     if (stderr) console.error(stderr);
   } catch (error) {
-    console.error(error);
+    throw new Error(`error in markTaskAsDone function: "${error}"`);
   }
 };
 
@@ -160,7 +162,7 @@ export const modifyTask = async (uuid: string, description?: string, project?: s
     const { stderr } = await execPromise(command);
     if (stderr) console.error(stderr);
   } catch (error) {
-    console.error(error);
+    throw new Error(`error in modifyTask function: "${error}"`);
   }
 };
 
