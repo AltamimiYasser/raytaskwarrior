@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { Task, Status } from './types/types';
+import { Task, Status, Priority } from './types/types';
 import { getPreferenceValues } from '@raycast/api';
 
 const execPromise = promisify(exec);
@@ -112,7 +112,8 @@ export const modifyTask = async (
   description?: string,
   project?: string,
   tags?: string[],
-  due?: string
+  due?: string,
+  priority?: Priority | ''
 ) => {
   const commandParts = [`${taskPath} modify`, uuid];
 
@@ -130,11 +131,18 @@ export const modifyTask = async (
 
   if (typeof tags !== 'undefined') {
     commandParts.push(...tags);
-    console.log(`commandParts: ${commandParts}`);
   }
 
   if (typeof due !== 'undefined') {
     commandParts.push(`due:${due}`);
+  }
+
+  if (typeof priority !== 'undefined') {
+    if (priority) {
+      commandParts.push(`priority:${priority}`);
+    } else {
+      commandParts.push(`priority:`);
+    }
   }
 
   const command = commandParts.join(' ');

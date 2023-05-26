@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Action, ActionPanel, Form, popToRoot, showToast, Toast } from '@raycast/api';
-import { Task } from '../types/types';
+import { Priority, Task } from '../types/types';
 import { modifyTask } from '../api';
 import { formatDueDate } from '../utils/dateFormatters';
 
@@ -14,12 +14,41 @@ interface FormValues {
 const Modify = (props: { task: Task }) => {
   const { task } = props;
 
+  const formatPriority = (priority?: Priority) => {
+    switch (priority) {
+      case Priority.H:
+        return 'High';
+      case Priority.M:
+        return 'Medium';
+      case Priority.L:
+        return 'Low';
+      default:
+        return 'None';
+    }
+  };
+
+  const parsePriority = (priority: string): Priority | '' | undefined => {
+    switch (priority) {
+      case 'High':
+        return Priority.H;
+      case 'Medium':
+        return Priority.M;
+      case 'Low':
+        return Priority.L;
+      case 'None':
+        return '';
+      default:
+        return undefined;
+    }
+  };
+
   const [descriptionError, setdescriptionError] = useState<string | undefined>();
   const [tagsError, setTagsError] = useState<string | undefined>();
   const [dueDateError, setDueDateError] = useState<string | undefined>();
   const [initialDueDate, setInitialDueDate] = useState<string | undefined>(
     task.due ? formatDueDate(task.due) : undefined
   );
+  const [selectedPriority, setSelectedPriority] = useState<string>(formatPriority(task.priority));
 
   const dropDescriptionErrorIfNeeded = () => {
     if (descriptionError && descriptionError.length > 0) {
@@ -82,8 +111,9 @@ const Modify = (props: { task: Task }) => {
 
     const tagsArray = tags?.split(',');
     const updatedDueDate = due === initialDueDate ? undefined : due;
+    const parsedPriority = parsePriority(selectedPriority);
     try {
-      await modifyTask(task.uuid, description, project, tagsArray, updatedDueDate);
+      await modifyTask(task.uuid, description, project, tagsArray, updatedDueDate, parsedPriority);
       showToast({
         title: 'Modified Task successfully',
         style: Toast.Style.Success,
@@ -162,6 +192,17 @@ const Modify = (props: { task: Task }) => {
           error={dueDateError}
           onChange={dropDueDateErrorIfNeeded}
         />
+        <Form.Dropdown
+          id='priority'
+          title='Priority'
+          value={selectedPriority}
+          onChange={setSelectedPriority}
+        >
+          <Form.Dropdown.Item value='High' title='High' />
+          <Form.Dropdown.Item value='Medium' title='Medium' />
+          <Form.Dropdown.Item value='Low' title='Low' />
+          <Form.Dropdown.Item value='None' title='None' />
+        </Form.Dropdown>
       </Form>
     </>
   );
@@ -170,5 +211,4 @@ const Modify = (props: { task: Task }) => {
 export default Modify;
 
 // TODO: To Modify:
-// priority
-// Due: just like in Task warrior format
+// change due date to date picker?
