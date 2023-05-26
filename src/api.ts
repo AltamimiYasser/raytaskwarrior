@@ -27,7 +27,6 @@ export const getTasks = async () => {
   return tasks;
 };
 
-// TODO: maybe not needed
 //
 // returns a single task by its uuid
 export const getTask = async (uuid: string) => {
@@ -68,38 +67,6 @@ export const addTask = async (commandString: string) => {
   }
 };
 
-// adds a task and optionally can add a project or a tag or both
-// export const addTask = async (description: string, project?: string, tag?: string) => {
-//   // only description -> task add "<description>"
-//   let command = '';
-//   if (typeof project === 'undefined' && typeof tag === 'undefined') {
-//     command = `${taskPath} add "${description}"`;
-//   }
-//
-//   // description & project -> task add <description> project:<project>
-//   else if (typeof project !== 'undefined' && typeof tag === 'undefined') {
-//     command = `${taskPath} add "${description}" project:"${project}"`;
-//   }
-//
-//   // description & tag -> task add <description> +<tag>
-//   else if (typeof project === 'undefined' && typeof tag !== 'undefined') {
-//     command = `${taskPath} add "${description}" ${tag}`;
-//   }
-//
-//   // description & tag & project task add <description> project:<project> +<tag>
-//   else if (typeof project !== 'undefined' && typeof tag !== 'undefined') {
-//     command = `${taskPath} add "${description}" project:"${project}" ${tag}`;
-//   }
-//
-//   // execute command
-//   try {
-//     const { stderr } = await execPromise(command);
-//     if (stderr) console.error(stderr);
-//   } catch (error) {
-//     throw new Error(`error in addTask function: "${error}"`);
-//   }
-// };
-
 // delete task by its uuid
 export const deleteTask = async (uuid: string) => {
   try {
@@ -120,7 +87,7 @@ export const markTaskAsDone = async (uuid: string) => {
   }
 };
 
-export const modifyTask = async (
+export const updateTask = async (
   uuid: string | null,
   description?: string,
   project?: string,

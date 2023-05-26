@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Action, ActionPanel, Form, popToRoot, showToast, Toast } from '@raycast/api';
 import { Priority, Task } from '../types/types';
-import { modifyTask } from '../api';
+import { updateTask } from '../api';
 import { formatDueDate } from '../utils/dateFormatters';
 
 interface FormValues {
@@ -113,7 +113,7 @@ const Modify = (props: { task: Task }) => {
     const updatedDueDate = due === initialDueDate ? undefined : due;
     const parsedPriority = parsePriority(selectedPriority);
     try {
-      await modifyTask(task.uuid, description, project, tagsArray, updatedDueDate, parsedPriority);
+      await updateTask(task.uuid, description, project, tagsArray, updatedDueDate, parsedPriority);
       showToast({
         title: 'Modified Task successfully',
         style: Toast.Style.Success,
