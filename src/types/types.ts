@@ -11,13 +11,21 @@ export interface Task {
   end?: string;
   tags?: string[];
   project?: string;
+  priority?: Priority;
+  due?: string;
   [key: string]: any;
 }
 
 export enum Status {
-  Pending = "pending",
-  Deleted = "deleted",
-  Completed = "completed",
-  Waiting = "waiting",
-  Recurring = "recurring",
+  Pending = 'pending',
+  Deleted = 'deleted',
+  Completed = 'completed',
+  Waiting = 'waiting',
+  Recurring = 'recurring',
+}
+
+export enum Priority {
+  H = 'H',
+  M = 'M',
+  L = 'L',
 }
