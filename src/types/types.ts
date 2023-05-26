@@ -9,7 +9,7 @@ export interface Task {
   annotations?: string[]; //  TODO: enum?
   start?: string;
   end?: string;
-  tags?: string[];
+  tags?: Set<string>;
   project?: string;
   priority?: Priority;
   due?: string;

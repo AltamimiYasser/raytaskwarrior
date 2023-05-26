@@ -68,7 +68,10 @@ ${formatDueDate(task.due)}
     return md;
   }, []);
 
-  const tagColorMap = useMemo(() => assignRandomColorsToTags(task.tags || []), [task.tags]);
+  const tagColorMap = useMemo(
+    () => assignRandomColorsToTags(task.tags ? [...task.tags] : []),
+    [task.tags]
+  );
 
   // TODO: add actions
   return (
@@ -78,31 +81,40 @@ ${formatDueDate(task.due)}
         markdown={markdown}
         actions={
           <ActionPanel>
-            <Action.Push title='Modify' target={<Modify task={task} />} />
+            <Action.Push key='Modify' title='Modify' target={<Modify task={task} />} />
           </ActionPanel>
         }
         metadata={
           <Detail.Metadata>
             {task.entry ? (
-              <Detail.Metadata.Label title='Added on:' text={formatDate(task.entry)} />
+              <Detail.Metadata.Label key='entry' title='Added on:' text={formatDate(task.entry)} />
             ) : (
               ''
             )}
             {task.start ? (
-              <Detail.Metadata.Label title='Active for:' text={getActiveTime(task.start)} />
+              <Detail.Metadata.Label
+                key='start'
+                title='Active for:'
+                text={getActiveTime(task.start)}
+              />
             ) : (
               ''
             )}
             {task.modified ? (
-              <Detail.Metadata.Label title='Modified on:' text={formatDate(task.modified)} />
+              <Detail.Metadata.Label
+                key='modified'
+                title='Modified on:'
+                text={formatDate(task.modified)}
+              />
             ) : (
               ''
             )}
             {task.tags ? (
-              <Detail.Metadata.TagList title='tags'>
-                {task.tags.map((tag) => {
+              <Detail.Metadata.TagList key='TagsList' title='tags'>
+                {Array.from(task.tags).map((tag) => {
                   return (
                     <Detail.Metadata.TagList.Item
+                      key={tag}
                       text={tag}
                       color={tagColorMap.get(tag) || Color.Blue}
                     />
@@ -112,7 +124,11 @@ ${formatDueDate(task.due)}
             ) : (
               ''
             )}
-            <Detail.Metadata.Label title='Urgency:' text={task.urgency.toLocaleString()} />
+            <Detail.Metadata.Label
+              key='Urgency'
+              title='Urgency:'
+              text={task.urgency.toLocaleString()}
+            />
           </Detail.Metadata>
         }
       />

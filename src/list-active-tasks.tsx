@@ -81,7 +81,7 @@ const ListActiveTabs = () => {
         tasks.map((task) => (
           <List.Item
             id={task.uuid}
-            keywords={[task.tags?.join(' ') || '', task.project || '']}
+            keywords={[task.tags ? [...task.tags].join(' ') : '', task.project || '']}
             title={task.description}
             key={task.uuid}
             accessories={[{ text: task.project }]}
@@ -89,7 +89,7 @@ const ListActiveTabs = () => {
               // TODO: Add more actions: (modify, delete, mark as done)
               // check raycast default actions to add what fits
               <ActionPanel>
-                <Action.Push title='Details' target={<Details task={task} />} />
+                <Action.Push key='Details' title='Details' target={<Details task={task} />} />
               </ActionPanel>
             }
           />
