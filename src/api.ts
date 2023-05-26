@@ -9,8 +9,6 @@ const taskPath = getPreferenceValues().taskPath;
 const overrideError = 'Configuration override rc.json.array:on\n';
 const command = `${taskPath} export rc.json.array:on`;
 
-// TODO: Fix project methods doesn't need '-' passed to be removed
-// change tags to be a set
 //
 // returns a list of all tasks sorted by urgency
 export const getTasks = async () => {
@@ -109,107 +107,44 @@ export const markTaskAsDone = async (uuid: string) => {
     throw new Error(`error in markTaskAsDone function: "${error}"`);
   }
 };
-
-// tag is passed like this (+next) (-next) + to add and - to remove
 export const modifyTask = async (
   uuid: string,
   description?: string,
   project?: string,
-  tags?: string[]
+  tags?: string[],
+  due?: string
 ) => {
-  let command = '';
+  const commandParts = [`${taskPath} modify`, uuid];
 
-  // change description only:
-  if (
-    typeof description !== 'undefined' &&
-    typeof project === 'undefined' &&
-    typeof tags === 'undefined'
-  ) {
-    command = `${taskPath} modify ${uuid} "${description}"`;
+  if (typeof description !== 'undefined') {
+    commandParts.push(`"${description}"`);
   }
 
-  // change and remove project
-  if (
-    typeof description === 'undefined' &&
-    typeof project !== 'undefined' &&
-    typeof tags === 'undefined'
-  ) {
-    // change project only
-    if (project !== '-') command = `${taskPath} modify ${uuid} project:"${project}"`;
-
-    // Remove project only
-    if (project === '-') command = `${taskPath} modify ${uuid} project:`;
+  if (typeof project !== 'undefined') {
+    if (project !== '') {
+      commandParts.push(`project:"${project}"`);
+    } else {
+      commandParts.push(`project:`);
+    }
   }
 
-  // add and remove tags
-  if (
-    typeof description === 'undefined' &&
-    typeof project === 'undefined' &&
-    typeof tags !== 'undefined'
-  ) {
-    command = `${taskPath} modify ${uuid} ${Array.from(tags).join(' ')}`;
+  if (typeof tags !== 'undefined') {
+    commandParts.push(...tags);
+    console.log(`commandParts: ${commandParts}`);
   }
 
-  if (
-    typeof description !== 'undefined' &&
-    typeof project !== 'undefined' &&
-    typeof tags === 'undefined'
-  ) {
-    // Change description, change project
-    if (project !== '-')
-      command = `${taskPath} modify ${uuid} "${description}" project:"${project}"`;
-
-    // Change description, remove project
-    if (project === '-') command = `${taskPath} modify ${uuid} "${description}" project:`;
+  if (typeof due !== 'undefined') {
+    commandParts.push(`due:${due}`);
   }
 
-  // Change description & add or remove tag
-  if (
-    typeof description !== 'undefined' &&
-    typeof project === 'undefined' &&
-    typeof tags !== 'undefined'
-  ) {
-    command = `${taskPath} modify ${uuid} "${description}"  ${Array.from(tags).join(' ')}`;
-  }
-
-  if (
-    typeof description === 'undefined' &&
-    typeof project !== 'undefined' &&
-    typeof tags !== 'undefined'
-  ) {
-    // Change project, add or remove tag
-    if (project !== '-')
-      command = `${taskPath} modify ${uuid} project:"${project}" ${Array.from(tags).join(' ')}`;
-
-    // Remove project, add or remove tag
-    if (project === '-')
-      command = `${taskPath} modify ${uuid} project: ${Array.from(tags).join(' ')}`;
-  }
-
-  if (
-    typeof description !== 'undefined' &&
-    typeof project !== 'undefined' &&
-    typeof tags !== 'undefined'
-  ) {
-    // Change description, change project, add or remove tag
-    if (project !== '-')
-      command = `${taskPath} modify ${uuid} "${description}" project:"${project}" ${Array.from(
-        tags
-      ).join(' ')}`;
-
-    // Change description, remove project, add or remove tag
-    if (project === '-')
-      command = `${taskPath} modify "${description}" ${uuid} project: ${Array.from(tags).join(
-        ' '
-      )}`;
-  }
-
-  // execute command
+  const command = commandParts.join(' ');
   try {
     const { stderr } = await execPromise(command);
-    if (stderr) console.error(stderr);
+    if (stderr.includes('not a valid date')) {
+      throw new Error(`Invalid due date format. Use the Y-M-D format or Taskwarrior fromat`);
+    }
   } catch (error) {
-    throw new Error(`error in modifyTask function: "${error}"`);
+    throw new Error(`Error modifying task. ${error}`);
   }
 };
 
