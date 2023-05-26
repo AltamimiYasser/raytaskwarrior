@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Action, ActionPanel, Form, popToRoot, showToast, Toast } from '@raycast/api';
 import { Task } from '../types/types';
 import { modifyTask } from '../api';
+import { formatDueDate } from '../utils/dateFormatters';
 
 interface FormValues {
   description?: string;
   project?: string;
   tags?: string;
+  due?: string;
 }
 
 const Modify = (props: { task: Task }) => {
@@ -14,6 +16,10 @@ const Modify = (props: { task: Task }) => {
 
   const [descriptionError, setdescriptionError] = useState<string | undefined>();
   const [tagsError, setTagsError] = useState<string | undefined>();
+  const [dueDateError, setDueDateError] = useState<string | undefined>();
+  const [initialDueDate, setInitialDueDate] = useState<string | undefined>(
+    task.due ? formatDueDate(task.due) : undefined
+  );
 
   const dropDescriptionErrorIfNeeded = () => {
     if (descriptionError && descriptionError.length > 0) {
@@ -25,6 +31,23 @@ const Modify = (props: { task: Task }) => {
     if (tagsError && tagsError.length > 0) {
       setTagsError(undefined);
     }
+  };
+
+  const dropDueDateErrorIfNeeded = () => {
+    if (dueDateError && dueDateError.length > 0) {
+      setDueDateError(undefined);
+    }
+  };
+
+  const formatTags = (tags: Set<string>) => {
+    return Array.from(tags)
+      .map((tag) => {
+        if (tag.startsWith('+') || tag.startsWith('-')) {
+          return tag;
+        }
+        return `+${tag}`;
+      })
+      .join(',');
   };
 
   const isFormValid = (description?: string, tags?: string) => {
@@ -40,22 +63,45 @@ const Modify = (props: { task: Task }) => {
       isValid = false;
     }
 
+    if (tags) {
+      const tagsArray = tags.split(',');
+      const invalidTags = tagsArray.filter((tag) => !tag.startsWith('+') && !tag.startsWith('-'));
+      if (invalidTags.length > 0) {
+        setTagsError('Tags should start with + or -. Format: +tag1,-tag2,+tag3');
+        isValid = false;
+      }
+    }
+
     return isValid;
   };
 
-  const onSubmit = ({ description, project, tags }: FormValues) => {
+  const onSubmit = async ({ description, project, tags, due }: FormValues) => {
     if (!isFormValid(description, tags)) {
       return;
     }
 
     const tagsArray = tags?.split(',');
-    modifyTask(task.uuid, description, project, tagsArray);
-
-    showToast({
-      title: 'Modified Task successfully',
-      style: Toast.Style.Success,
-    });
-    popToRoot();
+    const updatedDueDate = due === initialDueDate ? undefined : due;
+    try {
+      await modifyTask(task.uuid, description, project, tagsArray, updatedDueDate);
+      showToast({
+        title: 'Modified Task successfully',
+        style: Toast.Style.Success,
+      });
+      popToRoot();
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('not a valid date')) {
+        setDueDateError(
+          "Invalid due date format. Use the 'Y-M-D' format or Taskwarrior shorthand."
+        );
+      } else {
+        console.error(error);
+        showToast({
+          title: `Error modifying task: ${error}`,
+          style: Toast.Style.Failure,
+        });
+      }
+    }
   };
 
   return (
@@ -94,8 +140,8 @@ const Modify = (props: { task: Task }) => {
         <Form.TextField
           id='tags'
           title='Tags'
-          placeholder='tag1,tag2,tag3'
-          defaultValue={task.tags ? Array.from(task.tags).join(',') : ''}
+          placeholder='-tag1,+tag2,+tag3'
+          defaultValue={task.tags ? formatTags(task.tags) : ''}
           info='add comma saparated list of tags. +tag to add and -tag to remove'
           error={tagsError}
           onChange={dropTagsErrorIfNeeded}
@@ -107,6 +153,15 @@ const Modify = (props: { task: Task }) => {
             }
           }}
         />
+        <Form.TextField
+          id='due'
+          title='Due Date'
+          placeholder='Y-M-D or Taskwarrior shorthand'
+          defaultValue={initialDueDate}
+          info="Enter due date in Y-M-D format or Taskwarrior shorthand (e.g., 'today', 'tomorrow', '+3d', '+1w')"
+          error={dueDateError}
+          onChange={dropDueDateErrorIfNeeded}
+        />
       </Form>
     </>
   );
@@ -115,6 +170,5 @@ const Modify = (props: { task: Task }) => {
 export default Modify;
 
 // TODO: To Modify:
-// Tags: comma saparated -> needs fixing from the API to the modification and the adding
 // priority
 // Due: just like in Task warrior format

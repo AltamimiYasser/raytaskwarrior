@@ -138,6 +138,8 @@ export const modifyTask = async (
   }
 
   const command = commandParts.join(' ');
+
+  // excute command
   try {
     const { stderr } = await execPromise(command);
     if (stderr.includes('not a valid date')) {
