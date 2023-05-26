@@ -70,12 +70,13 @@ const Command = () => {
       searchBarAccessory={<ProjectsDropdown projects={projects} onProjectChange={onProjectChange} />}
     >
       {tasks.length === 0 ? (
-        // TODO: add actions to add a new task
+        // TODO: add actions to add a new task when there are not tasks to display
         <List.EmptyView title="No Tasks Found" description="make sure you have added at least one task." />
       ) : (
         tasks.map((task) => (
           <List.Item
             id={task.uuid}
+            keywords={[task.tags?.join(" ") || "", task.project || ""]}
             title={task.description}
             key={task.uuid}
             accessories={[{ text: task.project }]}
