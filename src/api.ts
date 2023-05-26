@@ -147,7 +147,7 @@ export const modifyTask = async (
     typeof project === 'undefined' &&
     typeof tags !== 'undefined'
   ) {
-    command = `${taskPath} modify ${uuid} ${tags.join(' ')}`;
+    command = `${taskPath} modify ${uuid} ${Array.from(tags).join(' ')}`;
   }
 
   if (
@@ -169,7 +169,7 @@ export const modifyTask = async (
     typeof project === 'undefined' &&
     typeof tags !== 'undefined'
   ) {
-    command = `${taskPath} modify ${uuid} "${description}"  ${tags.join(' ')}`;
+    command = `${taskPath} modify ${uuid} "${description}"  ${Array.from(tags).join(' ')}`;
   }
 
   if (
@@ -179,10 +179,11 @@ export const modifyTask = async (
   ) {
     // Change project, add or remove tag
     if (project !== '-')
-      command = `${taskPath} modify ${uuid} project:"${project}" ${tags.join(' ')}`;
+      command = `${taskPath} modify ${uuid} project:"${project}" ${Array.from(tags).join(' ')}`;
 
     // Remove project, add or remove tag
-    if (project === '-') command = `${taskPath} modify ${uuid} project: ${tags.join(' ')}`;
+    if (project === '-')
+      command = `${taskPath} modify ${uuid} project: ${Array.from(tags).join(' ')}`;
   }
 
   if (
@@ -192,13 +193,15 @@ export const modifyTask = async (
   ) {
     // Change description, change project, add or remove tag
     if (project !== '-')
-      command = `${taskPath} modify ${uuid} "${description}" project:"${project}" ${tags.join(
-        ' '
-      )}`;
+      command = `${taskPath} modify ${uuid} "${description}" project:"${project}" ${Array.from(
+        tags
+      ).join(' ')}`;
 
     // Change description, remove project, add or remove tag
     if (project === '-')
-      command = `${taskPath} modify "${description}" ${uuid} project: ${tags.join(' ')}`;
+      command = `${taskPath} modify "${description}" ${uuid} project: ${Array.from(tags).join(
+        ' '
+      )}`;
   }
 
   // execute command

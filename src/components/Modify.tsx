@@ -6,13 +6,14 @@ import { modifyTask } from '../api';
 interface FormValues {
   description?: string;
   project?: string;
-  tags?: string[];
+  tags?: string;
 }
 
 const Modify = (props: { task: Task }) => {
   const { task } = props;
 
   const [descriptionError, setdescriptionError] = useState<string | undefined>();
+  const [tagsError, setTagsError] = useState<string | undefined>();
 
   const dropDescriptionErrorIfNeeded = () => {
     if (descriptionError && descriptionError.length > 0) {
@@ -20,8 +21,35 @@ const Modify = (props: { task: Task }) => {
     }
   };
 
+  const dropTagsErrorIfNeeded = () => {
+    if (tagsError && tagsError.length > 0) {
+      setTagsError(undefined);
+    }
+  };
+
+  const isFormValid = (description?: string, tags?: string) => {
+    let isValid = true;
+
+    if (!description || description.trim().length === 0) {
+      setdescriptionError('A task must at least have a description.');
+      isValid = false;
+    }
+
+    if (tags && tags.includes(' ')) {
+      setTagsError('spaces are not allowed. format: tag1,tag2,tag3');
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
   const onSubmit = ({ description, project, tags }: FormValues) => {
-    modifyTask(task.uuid, description, project, tags);
+    if (!isFormValid(description, tags)) {
+      return;
+    }
+
+    const tagsArray = tags?.split(',');
+    modifyTask(task.uuid, description, project, tagsArray);
 
     showToast({
       title: 'Modified Task successfully',
@@ -41,6 +69,7 @@ const Modify = (props: { task: Task }) => {
       >
         <Form.TextField
           id='description'
+          key='description'
           title='Description'
           placeholder='task description'
           defaultValue={task.description}
@@ -56,10 +85,27 @@ const Modify = (props: { task: Task }) => {
         />
         <Form.TextField
           id='project'
+          key='project'
           title='Project'
-          placeholder='project'
+          placeholder='project name'
           defaultValue={task.project ? task.project : ''}
           info='leave empty to delete or not add a new project'
+        />
+        <Form.TextField
+          id='tags'
+          title='Tags'
+          placeholder='tag1,tag2,tag3'
+          defaultValue={task.tags ? Array.from(task.tags).join(',') : ''}
+          info='add comma saparated list of tags. +tag to add and -tag to remove'
+          error={tagsError}
+          onChange={dropTagsErrorIfNeeded}
+          onBlur={(event) => {
+            if (event.target.value?.includes(' ')) {
+              setTagsError('spaces are not allowed. format: tag1,tag2,tag3');
+            } else {
+              dropTagsErrorIfNeeded();
+            }
+          }}
         />
       </Form>
     </>
@@ -69,8 +115,6 @@ const Modify = (props: { task: Task }) => {
 export default Modify;
 
 // TODO: To Modify:
-// description
 // Tags: comma saparated -> needs fixing from the API to the modification and the adding
-// project -> pass - to remove a project
 // priority
 // Due: just like in Task warrior format
