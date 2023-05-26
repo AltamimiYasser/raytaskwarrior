@@ -15,6 +15,26 @@
       "title": "List active tasks",
       "description": "list all your active tasks",
       "mode": "view"
+    },
+    {
+      "name": "addTaskSimple",
+      "title": "Add Task",
+      "description": "Add a new task using a simple command-line-like interface",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "taskInput",
+          "placeholder": "Enter task details",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "addTaskAdvanced",
+      "title": "Add Task Advanced",
+      "description": "Add a new Task using a full interface",
+      "mode": "view"
     }
   ],
   "dependencies": {

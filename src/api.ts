@@ -56,28 +56,8 @@ export const getTasksForTag = async (tag = 'next') => {
   );
 };
 
-// adds a task and optionally can add a project or a tag or both
-export const addTask = async (description: string, project?: string, tag?: string) => {
-  // only description -> task add "<description>"
-  let command = '';
-  if (typeof project === 'undefined' && typeof tag === 'undefined') {
-    command = `${taskPath} add "${description}"`;
-  }
-
-  // description & project -> task add <description> project:<project>
-  else if (typeof project !== 'undefined' && typeof tag === 'undefined') {
-    command = `${taskPath} add "${description}" project:"${project}"`;
-  }
-
-  // description & tag -> task add <description> +<tag>
-  else if (typeof project === 'undefined' && typeof tag !== 'undefined') {
-    command = `${taskPath} add "${description}" ${tag}`;
-  }
-
-  // description & tag & project task add <description> project:<project> +<tag>
-  else if (typeof project !== 'undefined' && typeof tag !== 'undefined') {
-    command = `${taskPath} add "${description}" project:"${project}" ${tag}`;
-  }
+export const addTask = async (commandString: string) => {
+  const command = `${taskPath} add ${commandString}`;
 
   // execute command
   try {
@@ -87,6 +67,38 @@ export const addTask = async (description: string, project?: string, tag?: strin
     throw new Error(`error in addTask function: "${error}"`);
   }
 };
+
+// adds a task and optionally can add a project or a tag or both
+// export const addTask = async (description: string, project?: string, tag?: string) => {
+//   // only description -> task add "<description>"
+//   let command = '';
+//   if (typeof project === 'undefined' && typeof tag === 'undefined') {
+//     command = `${taskPath} add "${description}"`;
+//   }
+//
+//   // description & project -> task add <description> project:<project>
+//   else if (typeof project !== 'undefined' && typeof tag === 'undefined') {
+//     command = `${taskPath} add "${description}" project:"${project}"`;
+//   }
+//
+//   // description & tag -> task add <description> +<tag>
+//   else if (typeof project === 'undefined' && typeof tag !== 'undefined') {
+//     command = `${taskPath} add "${description}" ${tag}`;
+//   }
+//
+//   // description & tag & project task add <description> project:<project> +<tag>
+//   else if (typeof project !== 'undefined' && typeof tag !== 'undefined') {
+//     command = `${taskPath} add "${description}" project:"${project}" ${tag}`;
+//   }
+//
+//   // execute command
+//   try {
+//     const { stderr } = await execPromise(command);
+//     if (stderr) console.error(stderr);
+//   } catch (error) {
+//     throw new Error(`error in addTask function: "${error}"`);
+//   }
+// };
 
 // delete task by its uuid
 export const deleteTask = async (uuid: string) => {
@@ -107,15 +119,22 @@ export const markTaskAsDone = async (uuid: string) => {
     throw new Error(`error in markTaskAsDone function: "${error}"`);
   }
 };
+
 export const modifyTask = async (
-  uuid: string,
+  uuid: string | null,
   description?: string,
   project?: string,
   tags?: string[],
   due?: string,
   priority?: Priority | ''
 ) => {
-  const commandParts = [`${taskPath} modify`, uuid];
+  const commandParts = [`${taskPath}`];
+
+  if (uuid) {
+    commandParts.push('modify', uuid);
+  } else {
+    commandParts.push('add');
+  }
 
   if (typeof description !== 'undefined') {
     commandParts.push(`"${description}"`);
@@ -147,14 +166,14 @@ export const modifyTask = async (
 
   const command = commandParts.join(' ');
 
-  // excute command
+  // execute command
   try {
     const { stderr } = await execPromise(command);
     if (stderr.includes('not a valid date')) {
-      throw new Error(`Invalid due date format. Use the Y-M-D format or Taskwarrior fromat`);
+      throw new Error(`Invalid due date format. Use the Y-M-D format or Taskwarrior format`);
     }
   } catch (error) {
-    throw new Error(`Error modifying task. ${error}`);
+    throw new Error(`Error in modifyTask function. ${error}`);
   }
 };
 
