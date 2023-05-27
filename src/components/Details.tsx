@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
-import { Action, ActionPanel, Color, Detail } from '@raycast/api';
+import { Action, ActionPanel, Color, Detail, popToRoot, showToast, Toast } from '@raycast/api';
 import { Priority, Task } from '../types/types';
 import { formatDate, formatDueDate, getActiveTime } from '../utils/dateFormatters';
 import Modify from './Modify';
+import AddTaskAdvanced from '../addTaskAdvanced';
+import { deleteTask, markTaskAsDone } from '../api';
 
 const getRandomColor = (availableColors: Color[]): Color => {
   const randomIndex = Math.floor(Math.random() * availableColors.length);
@@ -73,7 +75,26 @@ ${formatDueDate(task.due)}
     [task.tags]
   );
 
-  // TODO: add actions
+  const showCustomToast = async (title: string, style: Toast.Style, message: string) => {
+    await showToast({
+      title: title,
+      style: style,
+      message: message,
+    });
+  };
+
+  const markTaskAsDoneAndGoBack = async (taskUuid: string) => {
+    await markTaskAsDone(taskUuid);
+    showCustomToast('Success', Toast.Style.Success, 'Task marked as done');
+    popToRoot();
+  };
+
+  const deleteAndGoBack = async (uuid: string) => {
+    await deleteTask(uuid);
+    showCustomToast('Success', Toast.Style.Success, 'Task Deleted');
+    popToRoot();
+  };
+
   return (
     <>
       <Detail
@@ -82,6 +103,20 @@ ${formatDueDate(task.due)}
         actions={
           <ActionPanel>
             <Action.Push key='Modify' title='Modify' target={<Modify task={task} />} />
+
+            <Action title='Mark as Done' onAction={() => markTaskAsDoneAndGoBack(task.uuid)} />
+            <Action
+              key='delete'
+              title='Delete'
+              shortcut={{ modifiers: ['ctrl'], key: 'x' }}
+              onAction={() => deleteAndGoBack(task.uuid)}
+            />
+            <Action.Push
+              key='new'
+              title='Add New Task'
+              target={<AddTaskAdvanced />}
+              shortcut={{ modifiers: ['cmd'], key: 'n' }}
+            />
           </ActionPanel>
         }
         metadata={

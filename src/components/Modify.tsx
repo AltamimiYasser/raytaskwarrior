@@ -209,6 +209,3 @@ const Modify = (props: { task: Task }) => {
 };
 
 export default Modify;
-
-// TODO: To Modify:
-// change due date to date picker?
