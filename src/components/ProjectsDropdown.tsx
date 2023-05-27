@@ -1,7 +1,5 @@
 import { List } from '@raycast/api';
 
-// TODO: make it generic so we can filter by project and tag
-//
 const ProjectsDropdown = (props: {
   projects: Set<string>;
   onProjectChange: (newValue: string) => void;

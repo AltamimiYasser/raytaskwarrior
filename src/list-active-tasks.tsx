@@ -6,6 +6,7 @@ import {
   getAllProjects,
   getTasksForProject,
   markTaskAsDone,
+  updateTask,
 } from './api';
 import ProjectsDropdown from './components/ProjectsDropdown';
 import { Task } from './types/types';
@@ -79,6 +80,12 @@ const ListActiveTabs = () => {
     showCustomToast('Success', Toast.Style.Success, 'Task Deleted');
   };
 
+  const startOrStopTask = async (task: Task) => {
+    const action = task.tags && Array.from(task.tags).includes('next') ? '-next' : '+next';
+    await updateTask(task.uuid, undefined, undefined, [action]);
+    getTasks();
+  };
+
   return (
     <List
       navigationTitle='filter by project'
@@ -110,6 +117,12 @@ const ListActiveTabs = () => {
                 <Action
                   title='Mark as Done'
                   onAction={() => markTaskAsDoneAndUpdateList(task.uuid)}
+                />
+                <Action
+                  key='start'
+                  title={task.tags && Array.from(task.tags).includes('next') ? 'Stop' : 'Start'}
+                  shortcut={{ modifiers: ['ctrl'], key: 's' }}
+                  onAction={() => startOrStopTask(task)}
                 />
                 <Action
                   key='delete'

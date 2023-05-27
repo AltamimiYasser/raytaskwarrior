@@ -45,9 +45,8 @@ const Modify = (props: { task: Task }) => {
   const [descriptionError, setdescriptionError] = useState<string | undefined>();
   const [tagsError, setTagsError] = useState<string | undefined>();
   const [dueDateError, setDueDateError] = useState<string | undefined>();
-  const [initialDueDate, setInitialDueDate] = useState<string | undefined>(
-    task.due ? formatDueDate(task.due) : undefined
-  );
+  const initialDueDate = task.due ? formatDueDate(task.due) : undefined;
+
   const [selectedPriority, setSelectedPriority] = useState<string>(formatPriority(task.priority));
 
   const dropDescriptionErrorIfNeeded = () => {

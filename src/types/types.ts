@@ -13,7 +13,7 @@ export interface Task {
   project?: string;
   priority?: Priority;
   due?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export enum Status {

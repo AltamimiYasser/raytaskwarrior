@@ -4,7 +4,7 @@ import { Priority, Task } from '../types/types';
 import { formatDate, formatDueDate, getActiveTime } from '../utils/dateFormatters';
 import Modify from './Modify';
 import AddTaskAdvanced from '../addTaskAdvanced';
-import { deleteTask, markTaskAsDone } from '../api';
+import { deleteTask, markTaskAsDone, updateTask } from '../api';
 
 const getRandomColor = (availableColors: Color[]): Color => {
   const randomIndex = Math.floor(Math.random() * availableColors.length);
@@ -78,6 +78,12 @@ const Details = (props: { task: Task }) => {
     }
   };
 
+  const startOrStopTask = async (task: Task) => {
+    const action = task.tags && Array.from(task.tags).includes('next') ? '-next' : '+next';
+    updateTask(task.uuid, undefined, undefined, [action]);
+    popToRoot();
+  };
+
   return (
     <>
       <Detail
@@ -93,6 +99,12 @@ const Details = (props: { task: Task }) => {
               title='Delete'
               shortcut={{ modifiers: ['ctrl'], key: 'x' }}
               onAction={() => deleteAndGoBack(task.uuid)}
+            />
+            <Action
+              key='start'
+              title={task.tags && Array.from(task.tags).includes('next') ? 'Stop' : 'Start'}
+              shortcut={{ modifiers: ['ctrl'], key: 's' }}
+              onAction={() => startOrStopTask(task)}
             />
             <Action.Push
               key='new'
@@ -173,7 +185,5 @@ const Details = (props: { task: Task }) => {
     </>
   );
 };
-
-// TODO: add start action
 
 export default Details;
