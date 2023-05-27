@@ -38,38 +38,6 @@ const Details = (props: { task: Task }) => {
     return tagColorMap;
   };
 
-  const markdown = useMemo(() => {
-    let md = `
-## description:  
-${task.description}  
-## Status:  
-${task.status}   
-`;
-
-    if (task.project) {
-      md += `
-## project:  
-${task.project}  
-`;
-    }
-
-    if (task.priority) {
-      md += `
-## Priority:  
-${task.priority === Priority.H ? 'Hi' : task.priority === Priority.M ? 'Medium' : 'Low'}
-`;
-    }
-
-    if (task.due) {
-      md += `
-## Due:  
-${formatDueDate(task.due)}
-`;
-    }
-
-    return md;
-  }, []);
-
   const tagColorMap = useMemo(
     () => assignRandomColorsToTags(task.tags ? [...task.tags] : []),
     [task.tags]
@@ -95,11 +63,26 @@ ${formatDueDate(task.due)}
     popToRoot();
   };
 
+  const parsePriority = (priority: string): Priority | '' | undefined => {
+    switch (priority) {
+      case 'High':
+        return Priority.H;
+      case 'Medium':
+        return Priority.M;
+      case 'Low':
+        return Priority.L;
+      case 'None':
+        return '';
+      default:
+        return undefined;
+    }
+  };
+
   return (
     <>
       <Detail
         navigationTitle={task.description}
-        markdown={markdown}
+        markdown={`# ${task.description}`}
         actions={
           <ActionPanel>
             <Action.Push key='Modify' title='Modify' target={<Modify task={task} />} />
@@ -121,17 +104,42 @@ ${formatDueDate(task.due)}
         }
         metadata={
           <Detail.Metadata>
-            {task.entry ? (
-              <Detail.Metadata.Label key='entry' title='Added on:' text={formatDate(task.entry)} />
+            <Detail.Metadata.Label key='status' title='Status:' text={task.status} />
+            {task.project ? (
+              <Detail.Metadata.Label key='project' title='Project:' text={task.project} />
             ) : (
               ''
             )}
+            {task.priority ? (
+              <Detail.Metadata.Label
+                key='priority'
+                title='Priority:'
+                text={parsePriority(task.priority)}
+              />
+            ) : (
+              ''
+            )}
+            {task.due ? (
+              <Detail.Metadata.Label key='due' title='due:' text={formatDueDate(task.due)} />
+            ) : (
+              ''
+            )}
+            <Detail.Metadata.Label
+              key='Urgency'
+              title='Urgency:'
+              text={task.urgency.toLocaleString()}
+            />
             {task.start ? (
               <Detail.Metadata.Label
                 key='start'
                 title='Active for:'
                 text={getActiveTime(task.start)}
               />
+            ) : (
+              ''
+            )}
+            {task.entry ? (
+              <Detail.Metadata.Label key='entry' title='Added on:' text={formatDate(task.entry)} />
             ) : (
               ''
             )}
@@ -159,16 +167,13 @@ ${formatDueDate(task.due)}
             ) : (
               ''
             )}
-            <Detail.Metadata.Label
-              key='Urgency'
-              title='Urgency:'
-              text={task.urgency.toLocaleString()}
-            />
           </Detail.Metadata>
         }
       />
     </>
   );
 };
+
+// TODO: add start action
 
 export default Details;
