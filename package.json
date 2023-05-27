@@ -3,7 +3,7 @@
   "name": "raytaskwarrior",
   "title": "RayTaskwarrior",
   "description": "Taskwarrior integration to Raycast",
-  "icon": "command-icon.png",
+  "icon": "icon.png",
   "author": "yosy2010",
   "categories": [
     "Productivity"
@@ -13,12 +13,14 @@
     {
       "name": "list-active-tasks",
       "title": "List active tasks",
+      "subtitle": "Taskwarrior",
       "description": "list all your active tasks",
       "mode": "view"
     },
     {
       "name": "addTaskSimple",
       "title": "Add Task",
+      "subtitle": "Taskwarrior",
       "description": "Add a new task using a simple command-line-like interface",
       "mode": "no-view",
       "arguments": [
@@ -32,6 +34,7 @@
     },
     {
       "name": "addTaskAdvanced",
+      "subtitle": "Taskwarrior",
       "title": "Add Task Advanced",
       "description": "Add a new Task using a full interface",
       "mode": "view"
@@ -52,8 +55,9 @@
     {
       "name": "taskPath",
       "title": "Taskwarrior Path",
-      "description": "Your Taskwarrior path",
+      "description": "Your Taskwarrior path. Type 'which task' in your terminal and paste the path here.",
       "type": "textfield",
+      "placeholder": "/bin/task",
       "required": true
     }
   ],

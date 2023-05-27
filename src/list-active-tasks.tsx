@@ -88,7 +88,7 @@ const ListActiveTabs = () => {
 
   return (
     <List
-      navigationTitle='filter by project'
+      navigationTitle='Tasks'
       searchBarAccessory={
         <ProjectsDropdown projects={projects} onProjectChange={onProjectChange} />
       }
